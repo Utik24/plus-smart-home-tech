@@ -1,4 +1,93 @@
 @namespace("ru.yandex.practicum.kafka.telemetry.event")
 protocol HubEventProtocol {
+	/** Типы устройств */
+	enum DeviceTypeAvro {
+		MOTION_SENSOR,
+		TEMPERATURE_SENSOR,
+		LIGHT_SENSOR,
+		CLIMATE_SENSOR,
+		SWITCH_SENSOR
+	}
+
+	/** Типы условий для сценариев */
+	enum ConditionTypeAvro {
+		MOTION,
+		LUMINOSITY,
+		SWITCH,
+		TEMPERATURE,
+		CO2LEVEL,
+		HUMIDITY
+	}
+
+	/** Операторы для условий */
+	enum ConditionOperationAvro {
+		EQUALS,
+		GREATER_THAN,
+		LOWER_THAN
+	}
+
+	/** Типы действий в сценариях */
+	enum ActionTypeAvro {
+		ACTIVATE,
+		DEACTIVATE,
+		INVERSE,
+		SET_VALUE
+	}
+
+	/** Событие добавления устройства */
+	record DeviceAddedEventAvro {
+		string id;
+		DeviceTypeAvro type;
+	}
+
+	/** Событие удаления устройства */
+	record DeviceRemovedEventAvro {
+		string id;
+	}
+
+	/** Условие активации сценария */
+	record ScenarioConditionAvro {
+		string sensor_id;
+		ConditionTypeAvro type;
+		ConditionOperationAvro operation;
+		union { null, int, boolean } value = null;
+	}
+
+	/** Действие, выполняемое устройством в рамках сценария */
+	record DeviceActionAvro {
+		string sensor_id;
+		ActionTypeAvro type;
+		union { null, int } value = null;
+	}
+
+	/** Событие добавления сценария */
+	record ScenarioAddedEventAvro {
+		string name;
+		array<ScenarioConditionAvro> conditions;
+		array<DeviceActionAvro> actions;
+	}
+
+	/** Событие удаления сценария */
+	record ScenarioRemovedEventAvro {
+		string name;
+	}
+
+	/**
+	 * Обобщённое событие, происходящее в хабе.
+	 * Содержит одно из вложенных событий в поле payload.
+	 */
+	record HubEventAvro {
+		string hub_id;
+
+		@logicalType("timestamp-millis")
+		long timestamp;
+
+		union {
+			DeviceAddedEventAvro,
+			DeviceRemovedEventAvro,
+			ScenarioAddedEventAvro,
+			ScenarioRemovedEventAvro
+		} payload;
+	}
 
 }
