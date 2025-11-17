@@ -18,6 +18,7 @@ public class TemperatureSensorEventHandler extends BaseSensorEventHandler<Temper
         return SensorEventType.TEMPERATURE_SENSOR_EVENT;
     }
 
+
     @Override
     protected TemperatureSensorAvro mapToAvro(SensorEvent event) {
         TemperatureSensorEvent _event = (TemperatureSensorEvent) event;
