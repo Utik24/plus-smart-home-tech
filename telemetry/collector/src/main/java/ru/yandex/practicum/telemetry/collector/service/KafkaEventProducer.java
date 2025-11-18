@@ -37,8 +37,21 @@ public class KafkaEventProducer implements AutoCloseable {
         log.trace("Сохраняю событие {} с хабом {} в топик {}",
                 event.getClass().getSimpleName(), hubId, topic);
 
-        producer.send(record);
+        producer.send(record, (metadata, exception) -> {
+            if (exception != null) {
+                log.error("Не удалось отправить событие {} с хабом {} в топик {}",
+                        event.getClass().getSimpleName(), hubId, topic, exception);
+                return;
+            }
+
+            if (log.isTraceEnabled()) {
+                log.trace("Отправлено событие {} с хабом {} в топик {}: partition={}, offset={}",
+                        event.getClass().getSimpleName(), hubId, topic,
+                        metadata.partition(), metadata.offset());
+            }
+        });
     }
+
 
     @Override
     public void close() {
