@@ -77,3 +77,4 @@ public class EventController extends CollectorControllerGrpc.CollectorController
         }
     }
 }
+
