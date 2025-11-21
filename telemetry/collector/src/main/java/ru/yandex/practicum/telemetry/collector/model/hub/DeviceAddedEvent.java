@@ -13,6 +13,7 @@ public class DeviceAddedEvent extends HubEvent {
     private String Id;
     private DeviceType deviceType;
 
+
     @Override
     public HubEventType getType() {
         return HubEventType.DEVICE_ADDED;
