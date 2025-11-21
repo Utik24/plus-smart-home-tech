@@ -43,15 +43,15 @@ public class SnapshotServiceImpl implements SnapshotService {
         if (oldSensorStateAvro != null) {
             long oldTimestamp = oldSensorStateAvro.getTimestamp().toEpochMilli();
 
-            // 2. Проверка по времени: игнорируем старые или равные события
-            if (oldTimestamp >= eventTimestamp) {
-                log.trace("Событие от датчика {} игнорировано: старый таймстемп {} новее или равен новому {}",
+            // 2. Проверка по времени: игнорируем только события с более старым таймстемпом
+            if (oldTimestamp > eventTimestamp) {
+                log.trace("Событие от датчика {} игнорировано: старый таймстемп {} новее нового {}",
                         sensorId, Instant.ofEpochMilli(oldTimestamp), Instant.ofEpochMilli(eventTimestamp));
                 return Optional.empty();
             }
 
-            // 3. Проверка по данным: игнорируем, если данные не изменились
-            if (oldSensorStateAvro.getPayload().equals(eventAvro.getPayload())) {
+            // 3. Проверка по данным: игнорируем дубли с теми же данными
+            if (oldTimestamp == eventTimestamp && oldSensorStateAvro.getPayload().equals(eventAvro.getPayload())) {
                 log.trace("Событие от датчика {} игнорировано: данные не изменились", sensorId);
                 return Optional.empty();
             }
