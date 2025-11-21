@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:analyzer;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+
+analyzer:
+  kafka:
+    snapshot-consumer:
+      topic: telemetry.snapshots.v1
+      poll-timeout: 100ms
+      properties:
+        bootstrap.servers: localhost:9092
+        enable.auto.commit: false
+        group.id: telemetry.analyzer.snapshots
+        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value.deserializer: ru.yandex.practicum.kafka.deserializer.SensorsSnapshotDeserializer
+    hub-consumer:
+      topic: telemetry.hubs.v1
+      poll-timeout: 1s
+      properties:
+        bootstrap.servers: localhost:9092
+        enable.auto.commit: true
+        group.id: telemetry.analyzer.hubs
+        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value.deserializer: ru.yandex.practicum.kafka.deserializer.HubEventDeserializer
+
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
