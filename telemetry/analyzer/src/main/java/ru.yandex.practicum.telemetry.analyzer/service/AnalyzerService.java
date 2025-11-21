@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
 import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc;
+import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.telemetry.analyzer.model.*;
 import ru.yandex.practicum.telemetry.analyzer.model.enums.ActionType;
@@ -197,7 +198,7 @@ public class AnalyzerService {
         for (ScenarioAction action : scenario.getActions()) {
             DeviceActionProto.Builder actionBuilder = DeviceActionProto.newBuilder()
                     .setSensorId(action.getSensor().getId())
-                    .setType(DeviceActionProto.ActionTypeProto.valueOf(action.getAction().getType().name()));
+                    .setType(ActionTypeProto.valueOf(action.getAction().getType().name()));
             if (action.getAction().getValue() != null) {
                 actionBuilder.setValue(action.getAction().getValue());
             }
