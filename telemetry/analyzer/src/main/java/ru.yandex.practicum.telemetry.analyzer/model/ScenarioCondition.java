@@ -18,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = {"scenario", "sensor", "condition"})
 @Entity
 @Table(name = "scenario_conditions")
 public class ScenarioCondition {
