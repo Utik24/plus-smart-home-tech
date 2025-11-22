@@ -13,9 +13,9 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 import ru.yandex.practicum.telemetry.analyzer.config.AnalyzerKafkaProperties;
 import ru.yandex.practicum.telemetry.analyzer.service.AnalyzerService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
@@ -23,7 +23,6 @@ public class SnapshotProcessor {
     private final AnalyzerService analyzerService;
     private final AnalyzerKafkaProperties.ConsumerConfig consumerConfig;
     private final KafkaConsumer<String, SensorsSnapshotAvro> consumer;
-    private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new ConcurrentHashMap<>();
 
     @Autowired
     public SnapshotProcessor(AnalyzerService analyzerService, AnalyzerKafkaProperties properties) {
@@ -45,12 +44,20 @@ public class SnapshotProcessor {
                     continue;
                 }
 
-                for (ConsumerRecord<String, SensorsSnapshotAvro> record : consumerRecords) {
-                    analyzerService.processSnapshot(record.value());
-                    currentOffsets.put(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset() + 1));
+                Map<TopicPartition, OffsetAndMetadata> offsetsToCommit = new HashMap<>();
+
+                for (TopicPartition partition : consumerRecords.partitions()) {
+                    List<ConsumerRecord<String, SensorsSnapshotAvro>> partitionRecords = consumerRecords.records(partition);
+
+                    for (ConsumerRecord<String, SensorsSnapshotAvro> record : partitionRecords) {
+                        analyzerService.processSnapshot(record.value());
+                    }
+
+                    long nextOffset = partitionRecords.get(partitionRecords.size() - 1).offset() + 1;
+                    offsetsToCommit.put(partition, new OffsetAndMetadata(nextOffset));
                 }
 
-                consumer.commitAsync(currentOffsets, (offsets, exception) -> {
+                consumer.commitAsync(offsetsToCommit, (offsets, exception) -> {
                     if (exception != null) {
                         log.warn("Ошибка при фиксации оффсетов снапшотов: {}", offsets, exception);
                     }
@@ -62,7 +69,7 @@ public class SnapshotProcessor {
             log.error("Ошибка при обработке снапшотов", e);
         } finally {
             try {
-                consumer.commitSync(currentOffsets);
+                consumer.commitSync();
             } finally {
                 consumer.close();
             }

@@ -1,15 +1,16 @@
 package ru.yandex.practicum.telemetry.analyzer.service;
 
 import com.google.protobuf.util.Timestamps;
+import io.grpc.StatusRuntimeException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
 import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc;
-import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.telemetry.analyzer.model.*;
 import ru.yandex.practicum.telemetry.analyzer.model.enums.ActionType;
@@ -49,7 +50,7 @@ public class AnalyzerService {
     @Transactional
     public void processSnapshot(SensorsSnapshotAvro snapshotAvro) {
         String hubId = snapshotAvro.getHubId().toString();
-        List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
+        List<Scenario> scenarios = scenarioRepository.findWithSensorsByHubId(hubId);
 
         if (scenarios.isEmpty()) {
             log.trace("Для хаба {} нет сценариев для проверки", hubId);
@@ -73,7 +74,7 @@ public class AnalyzerService {
     private void removeDevice(String hubId, DeviceRemovedEventAvro deviceRemovedEventAvro) {
         String sensorId = deviceRemovedEventAvro.getId().toString();
         sensorRepository.findByIdAndHubId(sensorId, hubId).ifPresent(sensor -> {
-            List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
+            List<Scenario> scenarios = scenarioRepository.findWithSensorsByHubId(hubId);
             for (Scenario scenario : scenarios) {
                 boolean changed = scenario.getConditions().removeIf(link -> sensorId.equals(link.getSensor().getId()));
                 changed |= scenario.getActions().removeIf(link -> sensorId.equals(link.getSensor().getId()));
@@ -165,9 +166,12 @@ public class AnalyzerService {
 
     private Optional<Integer> readValue(ConditionType type, Object payload) {
         return switch (type) {
-            case MOTION -> payload instanceof MotionSensorAvro m ? Optional.of(m.getMotion() ? 1 : 0) : Optional.empty();
-            case LUMINOSITY -> payload instanceof LightSensorAvro light ? Optional.of(light.getLuminosity()) : Optional.empty();
-            case SWITCH -> payload instanceof SwitchSensorAvro sensor ? Optional.of(sensor.getState() ? 1 : 0) : Optional.empty();
+            case MOTION ->
+                    payload instanceof MotionSensorAvro m ? Optional.of(m.getMotion() ? 1 : 0) : Optional.empty();
+            case LUMINOSITY ->
+                    payload instanceof LightSensorAvro light ? Optional.of(light.getLuminosity()) : Optional.empty();
+            case SWITCH ->
+                    payload instanceof SwitchSensorAvro sensor ? Optional.of(sensor.getState() ? 1 : 0) : Optional.empty();
             case TEMPERATURE -> {
                 if (payload instanceof TemperatureSensorAvro temp) {
                     yield Optional.of(temp.getTemperatureC());
@@ -176,8 +180,10 @@ public class AnalyzerService {
                 }
                 yield Optional.empty();
             }
-            case CO2LEVEL -> payload instanceof ClimateSensorAvro climate ? Optional.of(climate.getCo2Level()) : Optional.empty();
-            case HUMIDITY -> payload instanceof ClimateSensorAvro climate ? Optional.of(climate.getHumidity()) : Optional.empty();
+            case CO2LEVEL ->
+                    payload instanceof ClimateSensorAvro climate ? Optional.of(climate.getCo2Level()) : Optional.empty();
+            case HUMIDITY ->
+                    payload instanceof ClimateSensorAvro climate ? Optional.of(climate.getHumidity()) : Optional.empty();
         };
     }
 
@@ -210,21 +216,24 @@ public class AnalyzerService {
                     .setTimestamp(Timestamps.fromMillis(snapshotAvro.getTimestamp().toEpochMilli()))
                     .build();
 
-            hubRouterClient.handleDeviceAction(request);
-            log.info("Отправлено действие {} для сценария {} хаба {}", action.getAction().getType(), scenario.getName(), scenario.getHubId());
+            try {
+                hubRouterClient.handleDeviceAction(request);
+                log.info("Отправлено действие {} для сценария {} хаба {}", action.getAction().getType(), scenario.getName(), scenario.getHubId());
+            } catch (StatusRuntimeException ex) {
+                log.error("Ошибка при отправке действия {} для сценария {} хаба {}", action.getAction().getType(), scenario.getName(), scenario.getHubId(), ex);
+            }
         }
-    }
 
-    private Integer asInteger(Object value) {
-        if (value == null) {
+        private Integer asInteger (Object value){
+            if (value == null) {
+                return null;
+            }
+            if (value instanceof Integer integer) {
+                return integer;
+            }
+            if (value instanceof Boolean bool) {
+                return bool ? 1 : 0;
+            }
             return null;
         }
-        if (value instanceof Integer integer) {
-            return integer;
-        }
-        if (value instanceof Boolean bool) {
-            return bool ? 1 : 0;
-        }
-        return null;
     }
-}
