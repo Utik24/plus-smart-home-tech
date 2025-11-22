@@ -224,18 +224,18 @@ public class AnalyzerService {
             }
         }
 
-        private Integer asInteger(Object value) {
-            if (value == null) {
-                return null;
-            }
-            if (value instanceof Integer integer) {
-                return integer;
-            }
-            if (value instanceof Boolean bool) {
-                return bool ? 1 : 0;
-            }
-            return null;
-        }
     }
 
+    private Integer asInteger(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Integer integer) {
+            return integer;
+        }
+        if (value instanceof Boolean bool) {
+            return bool ? 1 : 0;
+        }
+        return null;
+    }
 }
