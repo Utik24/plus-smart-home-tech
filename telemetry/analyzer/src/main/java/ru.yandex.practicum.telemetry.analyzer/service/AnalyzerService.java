@@ -224,7 +224,7 @@ public class AnalyzerService {
             }
         }
 
-        private Integer asInteger (Object value){
+        private Integer asInteger(Object value) {
             if (value == null) {
                 return null;
             }
@@ -237,3 +237,5 @@ public class AnalyzerService {
             return null;
         }
     }
+
+}
