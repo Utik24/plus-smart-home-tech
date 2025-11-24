@@ -74,18 +74,18 @@ public class AnalyzerService {
     private void removeDevice(String hubId, DeviceRemovedEventAvro deviceRemovedEventAvro) {
         String sensorId = deviceRemovedEventAvro.getId().toString();
         sensorRepository.findByIdAndHubId(sensorId, hubId).ifPresent(sensor -> {
+
             List<Scenario> scenarios = scenarioRepository.findWithSensorsByHubId(hubId);
+
             for (Scenario scenario : scenarios) {
-                boolean changed = scenario.getConditions().removeIf(link -> sensorId.equals(link.getSensor().getId()));
-                changed |= scenario.getActions().removeIf(link -> sensorId.equals(link.getSensor().getId()));
-                if (changed) {
-                    scenarioRepository.save(scenario);
-                }
+                scenario.getConditions().removeIf(link -> sensorId.equals(link.getSensor().getId()));
+                scenario.getActions().removeIf(link -> sensorId.equals(link.getSensor().getId()));
             }
             sensorRepository.delete(sensor);
             log.info("Удалено устройство {} из хаба {}", sensorId, hubId);
         });
     }
+
 
     private void saveScenario(String hubId, ScenarioAddedEventAvro scenarioAddedEventAvro) {
         String name = scenarioAddedEventAvro.getName().toString();
