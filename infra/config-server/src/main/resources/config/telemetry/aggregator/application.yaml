@@ -9,7 +9,7 @@ aggregator:
 
     consumer:
       properties:
-        "bootstrap.servers": localhost:9092
+        "bootstrap.servers": localhost:8888
         "enable.auto.commit": false
         "group.id": telemetry.aggregator.sensors
         "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
