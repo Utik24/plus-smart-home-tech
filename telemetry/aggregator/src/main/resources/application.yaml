@@ -1,18 +1,11 @@
-aggregator:
-  kafka:
-    producer:
-      properties:
-        "bootstrap.servers": localhost:9092
-        "key.serializer": org.apache.kafka.common.serialization.StringSerializer
-        "value.serializer": ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
-      topic: telemetry.snapshots.v1
-
-    consumer:
-      properties:
-        "bootstrap.servers": localhost:9092
-        "enable.auto.commit": false
-        "group.id": telemetry.aggregator.sensors
-        "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
-        "value.deserializer": ru.yandex.practicum.kafka.deserializer.SensorEventDeserializer
-      topic: telemetry.sensors.v1
-      poll-timeout: 100ms
+spring:
+  application:
+    name: aggregator
+  config:
+    import: configserver:http://localhost:8888
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
