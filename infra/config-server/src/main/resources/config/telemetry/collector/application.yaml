@@ -2,7 +2,7 @@ collector:
   kafka:
     producer:
       properties:
-        "bootstrap.servers": localhost:8888
+        "bootstrap.servers": localhost:9092
         "client.id": "telemetry.collector"
         "key.serializer": org.apache.kafka.common.serialization.StringSerializer
         "value.serializer": ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer

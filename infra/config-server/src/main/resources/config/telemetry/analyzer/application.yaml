@@ -18,7 +18,7 @@ analyzer:
       topic: telemetry.snapshots.v1
       poll-timeout: 100ms
       properties:
-        bootstrap.servers: localhost:8888
+        bootstrap.servers: localhost:9092
         enable.auto.commit: false
         group.id: telemetry.analyzer.snapshots
         key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -27,7 +27,7 @@ analyzer:
       topic: telemetry.hubs.v1
       poll-timeout: 1s
       properties:
-        bootstrap.servers: localhost:8888
+        bootstrap.servers: localhost:9092
         enable.auto.commit: true
         group.id: telemetry.analyzer.hubs
         key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
