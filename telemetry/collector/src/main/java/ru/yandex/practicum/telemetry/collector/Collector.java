@@ -10,4 +10,5 @@ public class Collector {
     public static void main(String[] args) {
         SpringApplication.run(Collector.class, args);
     }
+
 }
