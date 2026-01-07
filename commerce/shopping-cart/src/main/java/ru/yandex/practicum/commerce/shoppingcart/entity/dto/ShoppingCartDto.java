@@ -8,8 +8,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class ShoppingCartDto {
-    private final UUID shoppingCartId;
-    private final Map<UUID, Long> products;
+    private UUID shoppingCartId;
+    private Map<UUID, Integer> products;
 }
