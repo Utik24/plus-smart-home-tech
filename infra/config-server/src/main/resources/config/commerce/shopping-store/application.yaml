@@ -12,4 +12,7 @@ spring:
       temp.use_jdbc_metadata_defaults: false
     hibernate.ddl-auto: none
     show-sql: false
-  sql.init.mode: always
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql

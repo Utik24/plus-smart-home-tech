@@ -40,14 +40,16 @@ public class ProductService {
     @Transactional
     public ProductDto updateProduct(ProductDto productDto) throws FeignException {
         UUID productId = productDto.getProductId();
-        Product product = productRepository.findById(productId).orElse(null);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Продукт не найден"));
         updateProductFilds(product, productDto);
         return productMapper.toProductDto(productRepository.save(product));
     }
 
     @Transactional
     public boolean removeProductFromStore(UUID productId) throws FeignException {
-        Product product = productRepository.findById(productId).orElse(null);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Продукт не найден"));
         product.setProductState(ProductState.DEACTIVATE);
         productRepository.save(product);
         return true;
@@ -55,7 +57,8 @@ public class ProductService {
 
     @Transactional
     public Boolean setQuantityState(UUID productId, QuantityState quantityState) throws FeignException {
-        Product product = productRepository.findById(productId).orElse(null);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Продукт не найден"));
         product.setQuantityState(quantityState);
         productRepository.save(product);
         return true;
