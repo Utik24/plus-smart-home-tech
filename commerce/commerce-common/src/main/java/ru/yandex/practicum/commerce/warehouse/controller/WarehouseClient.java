@@ -13,7 +13,7 @@ import ru.yandex.practicum.commerce.warehouse.entity.dto.AddressDto;
 import ru.yandex.practicum.commerce.warehouse.entity.dto.BookedProductsDto;
 import ru.yandex.practicum.commerce.warehouse.entity.dto.NewProductInWarehouseRequest;
 
-@FeignClient(name = "warehouse-service", path = "/api/v1/warehouse")
+@FeignClient(name = "warehouse", path = "/api/v1/warehouse")
 public interface WarehouseClient {
     @PutMapping
     void addProduct(@RequestBody @Valid NewProductInWarehouseRequest request) throws FeignException;
