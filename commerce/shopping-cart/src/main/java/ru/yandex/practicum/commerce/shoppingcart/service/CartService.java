@@ -32,8 +32,13 @@ public class CartService {
     }
 
     private ShoppingCart getActiveCart(String username) {
-        return cartRepository.findByUsernameAndActive(username, true)
+        ShoppingCart shoppingCart = cartRepository.findByUsernameAndActive(username, true)
                 .orElseGet(() -> createShoppingCart(username));
+        if (shoppingCart.getProducts() == null) {
+            shoppingCart.setProducts(new HashMap<>());
+            cartRepository.save(shoppingCart);
+        }
+        return shoppingCart;
     }
 
     @Transactional
