@@ -1,16 +1,17 @@
 package ru.yandex.practicum.commerce.shoppingcart.service;
 
 import feign.FeignException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.commerce.shoppingcart.entity.ShoppingCart;
 import ru.yandex.practicum.commerce.shoppingcart.entity.dto.ChangeProductQuantityRequest;
 import ru.yandex.practicum.commerce.shoppingcart.entity.dto.ShoppingCartDto;
+import ru.yandex.practicum.commerce.shoppingcart.error.CartProductNotFoundException;
 import ru.yandex.practicum.commerce.shoppingcart.mapper.CartMapper;
 import ru.yandex.practicum.commerce.shoppingcart.repository.CartRepository;
+import ru.yandex.practicum.commerce.warehouse.controller.WarehouseClient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +24,9 @@ import java.util.UUID;
 public class CartService {
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
+    private final WarehouseClient warehouseClient;
 
     public ShoppingCartDto getShoppingCart(String username) throws FeignException {
-
         ShoppingCart shoppingCart = getActiveCart(username);
         return cartMapper.toShoppingCartDto(shoppingCart);
     }
@@ -38,6 +39,9 @@ public class CartService {
     @Transactional
     public ShoppingCartDto addToCartProduct(String username, Map<UUID, Integer> products) throws FeignException {
         ShoppingCart shoppingCart = getActiveCart(username);
+        Map<UUID, Integer> expectedProducts = new HashMap<>(shoppingCart.getProducts());
+        products.forEach((productId, quantity) -> expectedProducts.merge(productId, quantity, Integer::sum));
+        warehouseClient.checkProductCount(new ShoppingCartDto(shoppingCart.getShoppingCartId(), expectedProducts));
         products.forEach((k, v) -> {
             shoppingCart.getProducts().merge(k, v, Integer::sum);
         });
@@ -45,6 +49,7 @@ public class CartService {
         return cartMapper.toShoppingCartDto(shoppingCart);
     }
 
+    @Transactional
     public void deleteCart(String username) throws FeignException {
         ShoppingCart shoppingCart = getActiveCart(username);
         shoppingCart.setActive(false);
@@ -59,13 +64,15 @@ public class CartService {
         return cartMapper.toShoppingCartDto(shoppingCart);
     }
 
+    @Transactional
     public ShoppingCartDto changeProductQuantity(ChangeProductQuantityRequest request, String username) throws FeignException {
         ShoppingCart shoppingCart = getActiveCart(username);
         UUID productId = request.getProductId();
         Integer quantity = request.getQuantity();
         if (!shoppingCart.getProducts().containsKey(productId)) {
-            throw new RuntimeException("Продукт не найден");
+            throw new CartProductNotFoundException(productId);
         }
+        warehouseClient.checkProductCount(new ShoppingCartDto(shoppingCart.getShoppingCartId(), Map.of(productId, quantity)));
         shoppingCart.getProducts().put(productId, quantity);
         cartRepository.save(shoppingCart);
         return cartMapper.toShoppingCartDto(shoppingCart);

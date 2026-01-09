@@ -22,7 +22,7 @@ public class ShoppingCartController implements ShoppingCartClient {
     private final CartService cartService;
 
     @Override
-    public ShoppingCartDto getShoppingCart(@RequestParam(name = "username") String username) throws FeignException {
+    public ShoppingCartDto getShoppingCart(@RequestParam String username) throws FeignException {
         log.info("Получить актуальную корзину для авторизованного пользователя {}.", username);
         return cartService.getShoppingCart(username);
     }
@@ -35,19 +35,22 @@ public class ShoppingCartController implements ShoppingCartClient {
     }
 
     @Override
-    public void deleteCart(@RequestParam(name = "username") String username) throws FeignException {
+    public void deleteCart(@RequestParam String username) throws FeignException {
         log.info("Деактивация корзины товаров для пользователя {}.", username);
         cartService.deleteCart(username);
     }
 
     @Override
-    public ShoppingCartDto removeFromCart(List<UUID> products, @RequestParam(name = "username") String username) throws FeignException {
+    public ShoppingCartDto removeFromCart(List<UUID> products, @RequestParam String username) throws FeignException {
         return cartService.removeFromCart(products, username);
     }
 
     @Override
-    public ShoppingCartDto changeProductQuantity(ChangeProductQuantityRequest request, @RequestParam(name = "username") String username) throws FeignException {
-        log.info("Изменить количество товаров в корзине.");
+    public ShoppingCartDto changeProductQuantity(ChangeProductQuantityRequest request, @RequestParam String username) throws FeignException {
+        log.info("Пользователь {} изменяет количество товара {} на {}.",
+                username,
+                request.getProductId(),
+                request.getQuantity());
         return cartService.changeProductQuantity(request, username);
     }
 }

@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.yandex.practicum.commerce.shoppingstore.entity.ProductCategory;
-import ru.yandex.practicum.commerce.shoppingstore.entity.ProductState;
+import ru.yandex.practicum.commerce.shoppingstore.enums.ProductState;
 import ru.yandex.practicum.commerce.shoppingstore.enums.QuantityState;
 
 import java.math.BigDecimal;

@@ -2,6 +2,7 @@ package ru.yandex.practicum.commerce.shoppingstore.controller;
 
 import feign.FeignException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ public interface ShoppingStoreClient {
     ProductDto updateProduct(@RequestBody @Valid ProductDto productDto) throws FeignException;
 
     @PostMapping("/removeProductFromStore")
-    Boolean removeProductFromStore(@RequestBody String productId) throws FeignException;
+    Boolean removeProductFromStore(@RequestBody @NotNull UUID productId) throws FeignException;
 
     @PostMapping("/quantityState")
     Boolean setQuantityState(@RequestParam UUID productId,

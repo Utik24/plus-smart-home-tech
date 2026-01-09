@@ -42,9 +42,9 @@ public class ShoppingStoreController implements ShoppingStoreClient {
     }
 
     @Override
-    public Boolean removeProductFromStore(String productId) throws FeignException {
+    public Boolean removeProductFromStore(UUID productId) throws FeignException {
         log.info("Удаляем продукт {}", productId);
-        return productService.removeProductFromStore(UUID.fromString(productId.replace("\"", "")));
+        return productService.removeProductFromStore(productId);
     }
 
     @Override
