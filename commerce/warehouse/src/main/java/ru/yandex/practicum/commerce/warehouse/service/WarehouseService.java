@@ -41,6 +41,8 @@ public class WarehouseService {
         warehouseRepository.findById(request.getProductId()).ifPresent(product -> {
             throw new WarehouseProductAlreadyExistsException(request.getProductId());
         });
+        WarehouseProduct warehouseProduct = warehouseMapper.toWarehouseProduct(request);
+        warehouseRepository.save(warehouseProduct);
     }
 
     @Transactional(readOnly = true)
