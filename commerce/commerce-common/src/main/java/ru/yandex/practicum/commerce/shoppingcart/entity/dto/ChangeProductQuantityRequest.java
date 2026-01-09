@@ -1,5 +1,6 @@
 package ru.yandex.practicum.commerce.shoppingcart.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class ChangeProductQuantityRequest {
     @NotNull(message = "productId не может быть пустым.")
     private UUID productId;
+    @JsonAlias("newQuantity")
     @Positive(message = "quantity должен быть больше 0.")
     private int quantity;
 
