@@ -3,6 +3,7 @@ package ru.yandex.practicum.commerce.shoppingcart.controller;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ public class ShoppingCartController implements ShoppingCartClient {
     }
 
     @Override
-    public ShoppingCartDto addToCart(Map<UUID, Integer> products,
+    public ShoppingCartDto addToCart(@RequestBody Map<UUID, Integer> products,
                                      @RequestParam(name = "username") String username) throws FeignException {
         log.info("{} добавил товар {} в корзину.", username, products);
         return cartService.addToCartProduct(username, products);
@@ -41,12 +42,14 @@ public class ShoppingCartController implements ShoppingCartClient {
     }
 
     @Override
-    public ShoppingCartDto removeFromCart(List<UUID> products, @RequestParam String username) throws FeignException {
+    public ShoppingCartDto removeFromCart(@RequestBody List<UUID> products,
+                                          @RequestParam String username) throws FeignException {
         return cartService.removeFromCart(products, username);
     }
 
     @Override
-    public ShoppingCartDto changeProductQuantity(ChangeProductQuantityRequest request, @RequestParam String username) throws FeignException {
+    public ShoppingCartDto changeProductQuantity(@RequestBody ChangeProductQuantityRequest request,
+                                                 @RequestParam String username) throws FeignException {
         log.info("Пользователь {} изменяет количество товара {} на {}.",
                 username,
                 request.getProductId(),
