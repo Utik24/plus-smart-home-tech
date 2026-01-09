@@ -3,10 +3,7 @@ package ru.yandex.practicum.commerce.shoppingcart.controller;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.commerce.shoppingcart.entity.dto.ChangeProductQuantityRequest;
 import ru.yandex.practicum.commerce.shoppingcart.entity.dto.ShoppingCartDto;
 import ru.yandex.practicum.commerce.shoppingcart.service.CartService;
@@ -23,12 +20,14 @@ public class ShoppingCartController implements ShoppingCartClient {
     private final CartService cartService;
 
     @Override
+    @GetMapping
     public ShoppingCartDto getShoppingCart(@RequestParam String username) throws FeignException {
         log.info("Получить актуальную корзину для авторизованного пользователя {}.", username);
         return cartService.getShoppingCart(username);
     }
 
     @Override
+    @PutMapping
     public ShoppingCartDto addToCart(@RequestBody Map<UUID, Integer> products,
                                      @RequestParam(name = "username") String username) throws FeignException {
         log.info("{} добавил товар {} в корзину.", username, products);
@@ -36,18 +35,21 @@ public class ShoppingCartController implements ShoppingCartClient {
     }
 
     @Override
+    @DeleteMapping
     public void deleteCart(@RequestParam String username) throws FeignException {
         log.info("Деактивация корзины товаров для пользователя {}.", username);
         cartService.deleteCart(username);
     }
 
     @Override
+    @PostMapping("/remove")
     public ShoppingCartDto removeFromCart(@RequestBody List<UUID> products,
                                           @RequestParam String username) throws FeignException {
         return cartService.removeFromCart(products, username);
     }
 
     @Override
+    @PostMapping("/change-quantity")
     public ShoppingCartDto changeProductQuantity(@RequestBody ChangeProductQuantityRequest request,
                                                  @RequestParam String username) throws FeignException {
         log.info("Пользователь {} изменяет количество товара {} на {}.",
