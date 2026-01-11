@@ -44,5 +44,5 @@ public class Product {
     private ProductCategory productCategory;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private Double price;
 }

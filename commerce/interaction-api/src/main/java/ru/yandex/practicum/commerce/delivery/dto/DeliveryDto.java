@@ -2,8 +2,8 @@ package ru.yandex.practicum.commerce.delivery.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.yandex.practicum.commerce.api.delivery.enums.DeliveryState;
-import ru.yandex.practicum.commerce.api.warehouse.dto.AddressDto;
+import ru.yandex.practicum.commerce.delivery.enums.DeliveryState;
+import ru.yandex.practicum.commerce.warehouse.entity.dto.AddressDto;
 
 import java.util.UUID;
 

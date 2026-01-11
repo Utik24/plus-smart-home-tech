@@ -2,7 +2,7 @@ package ru.yandex.practicum.commerce.order.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.commerce.api.order.dto.OrderDto;
+import ru.yandex.practicum.commerce.order.dto.OrderDto;
 import ru.yandex.practicum.commerce.order.entity.Order;
 
 import java.util.List;

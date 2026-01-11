@@ -3,9 +3,9 @@ package ru.yandex.practicum.commerce.order.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.commerce.api.order.client.OrderClient;
-import ru.yandex.practicum.commerce.api.order.dto.OrderDto;
-import ru.yandex.practicum.commerce.api.order.dto.ProductReturnRequest;
+import ru.yandex.practicum.commerce.order.client.OrderClient;
+import ru.yandex.practicum.commerce.order.dto.OrderDto;
+import ru.yandex.practicum.commerce.order.dto.ProductReturnRequest;
 import ru.yandex.practicum.commerce.order.service.OrderService;
 
 import java.util.List;

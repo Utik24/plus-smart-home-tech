@@ -3,10 +3,10 @@ package ru.yandex.practicum.commerce.delivery.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.commerce.api.delivery.client.DeliveryClient;
-import ru.yandex.practicum.commerce.api.delivery.dto.DeliveryDto;
-import ru.yandex.practicum.commerce.api.order.dto.OrderDto;
+import ru.yandex.practicum.commerce.delivery.client.DeliveryClient;
+import ru.yandex.practicum.commerce.delivery.dto.DeliveryDto;
 import ru.yandex.practicum.commerce.delivery.service.DeliveryService;
+import ru.yandex.practicum.commerce.order.dto.OrderDto;
 
 import java.util.UUID;
 

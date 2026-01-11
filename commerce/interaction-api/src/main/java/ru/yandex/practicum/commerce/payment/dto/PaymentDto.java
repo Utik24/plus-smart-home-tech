@@ -2,7 +2,7 @@ package ru.yandex.practicum.commerce.payment.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.yandex.practicum.commerce.api.payment.enums.PaymentStatus;
+import ru.yandex.practicum.commerce.payment.enums.PaymentStatus;
 
 import java.util.UUID;
 

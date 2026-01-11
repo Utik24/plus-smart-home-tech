@@ -4,8 +4,8 @@ import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.commerce.api.order.dto.OrderDto;
-import ru.yandex.practicum.commerce.api.payment.dto.PaymentDto;
+import ru.yandex.practicum.commerce.order.dto.OrderDto;
+import ru.yandex.practicum.commerce.payment.dto.PaymentDto;
 
 import java.util.UUID;
 

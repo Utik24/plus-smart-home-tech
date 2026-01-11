@@ -12,5 +12,5 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ShoppingCartDto {
     private UUID shoppingCartId;
-    private Map<UUID, Integer> products;
+    private Map<UUID, Long> products;
 }

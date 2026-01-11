@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.yandex.practicum.commerce.api.payment.enums.PaymentStatus;
+import ru.yandex.practicum.commerce.payment.enums.PaymentStatus;
 
 import java.util.UUID;
 

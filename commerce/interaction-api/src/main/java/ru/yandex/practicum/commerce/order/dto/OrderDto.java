@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import ru.yandex.practicum.commerce.api.order.enums.OrderState;
+import ru.yandex.practicum.commerce.order.enums.OrderState;
 
 import java.util.Map;
 import java.util.UUID;

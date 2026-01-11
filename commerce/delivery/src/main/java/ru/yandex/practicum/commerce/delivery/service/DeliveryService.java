@@ -3,15 +3,15 @@ package ru.yandex.practicum.commerce.delivery.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.commerce.api.delivery.dto.DeliveryDto;
-import ru.yandex.practicum.commerce.api.delivery.enums.DeliveryState;
-import ru.yandex.practicum.commerce.api.order.client.OrderClient;
-import ru.yandex.practicum.commerce.api.order.dto.OrderDto;
-import ru.yandex.practicum.commerce.api.warehouse.client.WarehouseClient;
-import ru.yandex.practicum.commerce.api.warehouse.dto.AddressDto;
+import ru.yandex.practicum.commerce.delivery.dto.DeliveryDto;
 import ru.yandex.practicum.commerce.delivery.entity.Delivery;
+import ru.yandex.practicum.commerce.delivery.enums.DeliveryState;
 import ru.yandex.practicum.commerce.delivery.mapper.AddressMapper;
 import ru.yandex.practicum.commerce.delivery.repository.DeliveryRepository;
+import ru.yandex.practicum.commerce.order.client.OrderClient;
+import ru.yandex.practicum.commerce.order.dto.OrderDto;
+import ru.yandex.practicum.commerce.warehouse.controller.WarehouseClient;
+import ru.yandex.practicum.commerce.warehouse.entity.dto.AddressDto;
 
 import java.util.UUID;
 

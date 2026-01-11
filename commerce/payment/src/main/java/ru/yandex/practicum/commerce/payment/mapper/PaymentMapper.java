@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.commerce.api.order.dto.OrderDto;
-import ru.yandex.practicum.commerce.api.payment.dto.PaymentDto;
+import ru.yandex.practicum.commerce.order.dto.OrderDto;
+import ru.yandex.practicum.commerce.payment.dto.PaymentDto;
 import ru.yandex.practicum.commerce.payment.entity.Payment;
 
 @Slf4j

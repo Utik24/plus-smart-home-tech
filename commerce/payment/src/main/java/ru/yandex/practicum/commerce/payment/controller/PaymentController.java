@@ -3,9 +3,9 @@ package ru.yandex.practicum.commerce.payment.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.commerce.api.order.dto.OrderDto;
-import ru.yandex.practicum.commerce.api.payment.client.PaymentClient;
-import ru.yandex.practicum.commerce.api.payment.dto.PaymentDto;
+import ru.yandex.practicum.commerce.order.dto.OrderDto;
+import ru.yandex.practicum.commerce.payment.client.PaymentClient;
+import ru.yandex.practicum.commerce.payment.dto.PaymentDto;
 import ru.yandex.practicum.commerce.payment.service.PaymentService;
 
 import java.util.UUID;

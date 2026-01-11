@@ -1,10 +1,10 @@
 package ru.yandex.practicum.commerce.delivery.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.commerce.api.delivery.dto.DeliveryDto;
-import ru.yandex.practicum.commerce.api.warehouse.dto.AddressDto;
+import ru.yandex.practicum.commerce.delivery.dto.DeliveryDto;
 import ru.yandex.practicum.commerce.delivery.entity.Delivery;
 import ru.yandex.practicum.commerce.delivery.entity.DeliveryAddress;
+import ru.yandex.practicum.commerce.warehouse.entity.dto.AddressDto;
 
 @Component
 public class AddressMapper {
