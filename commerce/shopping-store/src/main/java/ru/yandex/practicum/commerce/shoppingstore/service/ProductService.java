@@ -95,7 +95,7 @@ public class ProductService {
         if (productDto.getProductCategory() != null) {
             product.setProductCategory(productDto.getProductCategory());
         }
-        if (productDto.getPrice() != null && productDto.getPrice().compareTo(BigDecimal.ONE) >= 0) {
+        if (productDto.getPrice() != null && productDto.getPrice() >= 0) {
             product.setPrice(productDto.getPrice());
         }
     }
