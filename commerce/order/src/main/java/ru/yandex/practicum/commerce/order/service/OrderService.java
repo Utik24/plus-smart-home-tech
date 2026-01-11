@@ -1,0 +1,152 @@
+package ru.yandex.practicum.commerce.order.service;
+
+import jakarta.ws.rs.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.commerce.api.cart.dto.ShoppingCartDto;
+import ru.yandex.practicum.commerce.api.delivery.client.DeliveryClient;
+import ru.yandex.practicum.commerce.api.order.dto.OrderDto;
+import ru.yandex.practicum.commerce.api.order.dto.ProductReturnRequest;
+import ru.yandex.practicum.commerce.api.order.enums.OrderState;
+import ru.yandex.practicum.commerce.api.payment.client.PaymentClient;
+import ru.yandex.practicum.commerce.api.payment.dto.PaymentDto;
+import ru.yandex.practicum.commerce.api.warehouse.client.WarehouseClient;
+import ru.yandex.practicum.commerce.api.warehouse.dto.AssemblyProductsForOrderRequest;
+import ru.yandex.practicum.commerce.api.warehouse.dto.BookedProductsDto;
+import ru.yandex.practicum.commerce.order.entity.Order;
+import ru.yandex.practicum.commerce.order.mapper.OrderMapper;
+import ru.yandex.practicum.commerce.order.repository.OrderRepository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+    private final OrderRepository orderRepository;
+    private final WarehouseClient warehouseClient;
+    private final OrderMapper orderMapper;
+    private final PaymentClient paymentClient;
+    private final DeliveryClient deliveryClient;
+
+    public List<OrderDto> getOrder(String username){
+        log.info("Получить заказы пользователя {}", username);
+        return orderRepository.findAllByUsername(username);
+    }
+
+    public OrderDto createOrder(String username, @RequestBody OrderDto newOrder) {
+        BookedProductsDto bookedProducts = warehouseClient.checkProductCount(
+                new ShoppingCartDto(newOrder.getShoppingCartId(), newOrder.getProducts())
+        );
+
+        log.info("Products booked successfully: {}", bookedProducts);
+
+        Order order = orderMapper.toEntity(newOrder);
+        order.setUsername(username);
+        order.setState(OrderState.NEW);
+
+        Order savedOrder = orderRepository.save(order);
+        log.info("Order created with ID: {}", savedOrder.getOrderId());
+
+        return orderMapper.toDto(savedOrder);
+    }
+
+    public OrderDto returnProducts(ProductReturnRequest request) {
+        Order order = findOrderById(request.getOrderId());
+        request.getProducts().forEach((productId, quantity) -> {
+            long diffQuantity = order.getProducts().get(productId) - quantity;
+            if (diffQuantity <= 0) {order.getProducts().remove(productId);} else {
+                order.getProducts().put(productId, diffQuantity);
+            }
+        });
+        orderRepository.save(order);
+        warehouseClient.returnProductsToWarehouse(order.getProducts());
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto payment (UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.ON_PAYMENT);
+
+        OrderDto orderDto = orderMapper.toDto(order);
+        PaymentDto paymentDto = paymentClient.createPaymentOrder(orderDto);
+        order.setPaymentId(paymentDto.getPaymentId());
+        order.setProductPrice(paymentDto.getTotalPayment());
+        order.setTotalPrice(paymentDto.getFeeTotal());
+        order.setDeliveryPrice(paymentDto.getDeliveryTotal());
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto paymentFailed(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.PAYMENT_FAILED);
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto delivery(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.DELIVERED);
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto deliveryFailed(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.DELIVERY_FAILED);
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto completed(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.COMPLETED);
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto calculateTotal(UUID orderId) {
+        Order order = findOrderById(orderId);
+        Double total = paymentClient.calculateProductCost(orderMapper.toDto(order));
+        order.setTotalPrice(total);
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto calculateDelivery(UUID orderId) {
+        Order order = findOrderById(orderId);
+        Double deliveryTotal = deliveryClient.getDeliveryCost(orderMapper.toDto(order));
+        order.setTotalPrice(deliveryTotal);
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto assembly(UUID orderId) {
+        Order order = findOrderById(orderId);
+        AssemblyProductsForOrderRequest request = new AssemblyProductsForOrderRequest(orderId, order.getProducts());
+
+        BookedProductsDto bookedProducts = warehouseClient.assembleProducts(request);
+        order.setState(OrderState.ASSEMBLED);
+        order.setDeliveryWeight(bookedProducts.getDeliveryWeight());
+        order.setFragile(bookedProducts.isFragile());
+        order.setDeliveryVolume(bookedProducts.getDeliveryVolume());
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto assemblyFailed(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.ASSEMBLY_FAILED);
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+
+    private Order findOrderById(UUID orderId) {
+        return orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Заказ с id "+orderId+" не найден "));
+    }
+}

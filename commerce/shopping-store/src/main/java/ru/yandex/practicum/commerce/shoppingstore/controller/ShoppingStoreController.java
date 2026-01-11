@@ -8,8 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.commerce.shoppingstore.entity.ProductCategory;
-import ru.yandex.practicum.commerce.shoppingstore.entity.dto.ProductDto;
+import ru.yandex.practicum.commerce.shoppingstore.enums.ProductCategory;
+import ru.yandex.practicum.commerce.shoppingstore.dto.ProductDto;
 import ru.yandex.practicum.commerce.shoppingstore.enums.QuantityState;
 import ru.yandex.practicum.commerce.shoppingstore.service.ProductService;
 
