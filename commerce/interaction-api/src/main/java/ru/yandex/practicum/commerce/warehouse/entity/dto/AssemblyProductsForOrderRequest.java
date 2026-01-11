@@ -12,5 +12,5 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AssemblyProductsForOrderRequest {
     UUID orderId;
-    Map<UUID, Long> products;
+    Map<UUID, Integer> products;
 }

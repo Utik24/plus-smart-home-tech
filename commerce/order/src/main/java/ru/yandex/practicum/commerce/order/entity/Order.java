@@ -48,6 +48,6 @@ public class Order {
     @CollectionTable(name="order_products", joinColumns = @JoinColumn(name = "order_id"))
     @MapKeyColumn(name = "product_id")
     @Column(name = "quantity")
-    private Map<UUID, Long> products;
+    private Map<UUID, Integer> products;
 
 }

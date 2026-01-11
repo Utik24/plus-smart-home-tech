@@ -42,14 +42,14 @@ public class OrderService {
                 new ShoppingCartDto(newOrder.getShoppingCartId(), newOrder.getProducts())
         );
 
-        log.info("Products booked successfully: {}", bookedProducts);
+        log.info("Products зарезервированы успешно: {}", bookedProducts);
 
         Order order = orderMapper.toEntity(newOrder);
         order.setUsername(username);
         order.setState(OrderState.NEW);
 
         Order savedOrder = orderRepository.save(order);
-        log.info("Order created with ID: {}", savedOrder.getOrderId());
+        log.info("Order создан с ID: {}", savedOrder.getOrderId());
 
         return orderMapper.toDto(savedOrder);
     }
@@ -57,7 +57,7 @@ public class OrderService {
     public OrderDto returnProducts(ProductReturnRequest request) {
         Order order = findOrderById(request.getOrderId());
         request.getProducts().forEach((productId, quantity) -> {
-            long diffQuantity = order.getProducts().get(productId) - quantity;
+            int diffQuantity = (int) (order.getProducts().get(productId) - quantity);
             if (diffQuantity <= 0) {order.getProducts().remove(productId);} else {
                 order.getProducts().put(productId, diffQuantity);
             }

@@ -46,7 +46,7 @@ public class PaymentService {
     }
 
     public Double calculateProductCost(OrderDto orderDto) {
-        Map<UUID, Long> products = orderDto.getProducts();
+        Map<UUID, Integer> products = orderDto.getProducts();
         if (products == null || products.isEmpty()) {
             throw new IllegalArgumentException("Список продуктов не должен быть null или пустым");
         }

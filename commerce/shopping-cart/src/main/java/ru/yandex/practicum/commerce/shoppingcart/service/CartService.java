@@ -77,7 +77,7 @@ public class CartService {
         if (!shoppingCart.getProducts().containsKey(productId)) {
             throw new CartProductNotFoundException(productId);
         }
-        warehouseClient.checkProductCount(new ShoppingCartDto(shoppingCart.getShoppingCartId(), Map.of(productId, Long.valueOf(quantity))));
+        warehouseClient.checkProductCount(new ShoppingCartDto(shoppingCart.getShoppingCartId(), Map.of(productId, quantity)));
         shoppingCart.getProducts().put(productId, quantity);
         cartRepository.save(shoppingCart);
         return cartMapper.toShoppingCartDto(shoppingCart);

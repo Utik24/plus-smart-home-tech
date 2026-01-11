@@ -31,7 +31,7 @@ public interface WarehouseClient {
     void shippedWarehouse(@RequestBody @Valid ShippedToDeleveryRequest request) throws FeignException;
 
     @PostMapping("/return")
-    void returnProductsToWarehouse(@Valid @RequestBody Map<UUID, Long> products) throws FeignException;
+    void returnProductsToWarehouse(@Valid @RequestBody Map<UUID, Integer> products) throws FeignException;
 
     @PostMapping("/assembly")
     BookedProductsDto assembleProducts(@RequestBody @Valid AssemblyProductsForOrderRequest request) throws FeignException;

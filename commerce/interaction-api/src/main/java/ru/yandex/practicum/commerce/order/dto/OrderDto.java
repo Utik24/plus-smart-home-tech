@@ -20,7 +20,7 @@ public class OrderDto {
     @NotBlank
     private UUID shoppingCartId;
 
-    private Map<UUID, Long> products;
+    private Map<UUID, Integer> products;
 
     private UUID paymentId;
 
