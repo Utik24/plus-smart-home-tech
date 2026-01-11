@@ -62,6 +62,7 @@ public class OrderService {
                 order.getProducts().put(productId, diffQuantity);
             }
         });
+        order.setState(OrderState.PRODUCT_RETURNED);
         orderRepository.save(order);
         warehouseClient.returnProductsToWarehouse(order.getProducts());
         return orderMapper.toDto(order);
@@ -70,13 +71,33 @@ public class OrderService {
     public OrderDto payment (UUID orderId) {
         Order order = findOrderById(orderId);
         order.setState(OrderState.ON_PAYMENT);
+        if (order.getProductPrice() == null) {
+            Double productCost = paymentClient.calculateProductCost(orderMapper.toDto(order));
+            order.setProductPrice(productCost);
+        }
 
+        if (order.getDeliveryPrice() == null) {
+            Double deliveryCost = deliveryClient.getDeliveryCost(orderMapper.toDto(order));
+            order.setDeliveryPrice(deliveryCost);
+        }
+
+        if (order.getTotalPrice() == null) {
+            Double totalCost = paymentClient.calculateTotalCost(orderMapper.toDto(order));
+            order.setTotalPrice(totalCost);
+        }
         OrderDto orderDto = orderMapper.toDto(order);
         PaymentDto paymentDto = paymentClient.createPaymentOrder(orderDto);
         order.setPaymentId(paymentDto.getPaymentId());
-        order.setProductPrice(paymentDto.getTotalPayment());
-        order.setTotalPrice(paymentDto.getFeeTotal());
+        order.setProductPrice(paymentDto.getProductTotal());
+        order.setTotalPrice(paymentDto.getTotalPayment());
         order.setDeliveryPrice(paymentDto.getDeliveryTotal());
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
+    }
+
+    public OrderDto paymentSuccess(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.setState(OrderState.PAID);
         orderRepository.save(order);
         return orderMapper.toDto(order);
     }
@@ -111,7 +132,15 @@ public class OrderService {
 
     public OrderDto calculateTotal(UUID orderId) {
         Order order = findOrderById(orderId);
-        Double total = paymentClient.calculateProductCost(orderMapper.toDto(order));
+        if (order.getProductPrice() == null) {
+            Double productCost = paymentClient.calculateProductCost(orderMapper.toDto(order));
+            order.setProductPrice(productCost);
+        }
+        if (order.getDeliveryPrice() == null) {
+            Double deliveryCost = deliveryClient.getDeliveryCost(orderMapper.toDto(order));
+            order.setDeliveryPrice(deliveryCost);
+        }
+        Double total = paymentClient.calculateTotalCost(orderMapper.toDto(order));
         order.setTotalPrice(total);
         orderRepository.save(order);
         return orderMapper.toDto(order);
@@ -120,13 +149,16 @@ public class OrderService {
     public OrderDto calculateDelivery(UUID orderId) {
         Order order = findOrderById(orderId);
         Double deliveryTotal = deliveryClient.getDeliveryCost(orderMapper.toDto(order));
-        order.setTotalPrice(deliveryTotal);
+        order.setDeliveryPrice(deliveryTotal);
         orderRepository.save(order);
         return orderMapper.toDto(order);
     }
 
     public OrderDto assembly(UUID orderId) {
         Order order = findOrderById(orderId);
+        if (OrderState.ASSEMBLED.equals(order.getState())) {
+            return orderMapper.toDto(order);
+        }
         AssemblyProductsForOrderRequest request = new AssemblyProductsForOrderRequest(orderId, order.getProducts());
 
         BookedProductsDto bookedProducts = warehouseClient.assembleProducts(request);

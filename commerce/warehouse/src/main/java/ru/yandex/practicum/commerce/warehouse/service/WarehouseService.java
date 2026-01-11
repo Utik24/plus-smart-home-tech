@@ -83,6 +83,23 @@ public class WarehouseService {
                 .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
     }
 
+    @Transactional
+    public void reserveProducts(Map<UUID, Integer> products) {
+        Map<UUID, WarehouseProduct> productsById = getWarehouseProducts(products.keySet());
+        products.forEach((productId, quantity) -> {
+            WarehouseProduct warehouseProduct = productsById.get(productId);
+            if (warehouseProduct == null) {
+                throw new WarehouseProductNotFoundException(productId);
+            }
+            long availableQuantity = warehouseProduct.getQuantity();
+            if (availableQuantity < quantity) {
+                throw new InsufficientProductQuantityException(productId, quantity, availableQuantity);
+            }
+            warehouseProduct.setQuantity(availableQuantity - quantity);
+        });
+        warehouseRepository.saveAll(productsById.values());
+    }
+
     public void returnProductsToWarehouse(Map<UUID, Integer> products) throws FeignException {
         List<WarehouseProduct> warehouseProducts = warehouseRepository.findAllById(products.keySet());
         if (warehouseProducts.isEmpty()) {

@@ -47,7 +47,7 @@ public class WarehouseController implements WarehouseClient {
 
     @Override
     public void shippedWarehouse(ShippedToDeleveryRequest request) throws FeignException {
-
+        warehouseOrderService.updateDeliveryId(request.getOrderId(), request.getDeliveryId());
     }
 
     @Override
@@ -59,6 +59,7 @@ public class WarehouseController implements WarehouseClient {
     public BookedProductsDto assembleProducts(AssemblyProductsForOrderRequest request) throws FeignException {
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto(request.getOrderId(), request.getProducts());
         BookedProductsDto bookedProductsDto = checkProductCount(shoppingCartDto);
+        warehouseService.reserveProducts(request.getProducts());
 
         OrderBooking orderBooking = new OrderBooking();
         orderBooking.setOrderId(request.getOrderId());

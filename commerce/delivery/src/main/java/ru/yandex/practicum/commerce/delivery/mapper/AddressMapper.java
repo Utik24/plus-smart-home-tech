@@ -20,11 +20,11 @@ public class AddressMapper {
 
     public static AddressDto mapToAddressDto(DeliveryAddress address) {
         AddressDto dto = new AddressDto(
-        address.getCountry(),
-        address.getCity(),
-        address.getStreet(),
-        address.getHouse(),
-        address.getFlat()        );
+                address.getCountry(),
+                address.getCity(),
+                address.getStreet(),
+                address.getHouse(),
+                address.getFlat()        );
         return dto;
     }
 
@@ -35,6 +35,9 @@ public class AddressMapper {
         delivery.setToAddress(mapToAddress(dto.getToAddress()));
         delivery.setOrderId(dto.getOrderId());
         delivery.setDeliveryState(dto.getDeliveryState());
+        delivery.setDeliveryWeight(dto.getDeliveryWeight());
+        delivery.setDeliveryVolume(dto.getDeliveryVolume());
+        delivery.setFragile(dto.getFragile());
         return delivery;
     }
 
@@ -45,6 +48,9 @@ public class AddressMapper {
         dto.setToAddress(mapToAddressDto(delivery.getToAddress()));
         dto.setOrderId(delivery.getOrderId());
         dto.setDeliveryState(delivery.getDeliveryState());
+        dto.setDeliveryWeight(delivery.getDeliveryWeight());
+        dto.setDeliveryVolume(delivery.getDeliveryVolume());
+        dto.setFragile(delivery.getFragile());
         return dto;
     }
 }

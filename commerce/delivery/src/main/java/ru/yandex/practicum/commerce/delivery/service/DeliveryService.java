@@ -12,6 +12,7 @@ import ru.yandex.practicum.commerce.order.client.OrderClient;
 import ru.yandex.practicum.commerce.order.dto.OrderDto;
 import ru.yandex.practicum.commerce.warehouse.controller.WarehouseClient;
 import ru.yandex.practicum.commerce.warehouse.entity.dto.AddressDto;
+import ru.yandex.practicum.commerce.warehouse.entity.dto.ShippedToDeleveryRequest;
 
 import java.util.UUID;
 
@@ -36,13 +37,14 @@ public class DeliveryService {
         Delivery delivery = deliveryRepository.findById(deliveryId).orElseThrow(()-> new RuntimeException("Delivery with id " + deliveryId + " not found"));
         delivery.setDeliveryState(DeliveryState.DELIVERED);
         deliveryRepository.save(delivery);
-        orderClient.completed(delivery.getOrderId());
+        orderClient.delivery(delivery.getOrderId());
     }
 
     public void pickedDelivery(UUID deliveryId) {
         Delivery delivery = deliveryRepository.findById(deliveryId).orElseThrow(()-> new RuntimeException("Delivery with id " + deliveryId + " not found"));
         delivery.setDeliveryState(DeliveryState.IN_PROGRESS);
         deliveryRepository.save(delivery);
+        warehouseClient.shippedWarehouse(new ShippedToDeleveryRequest(delivery.getOrderId(), deliveryId));
         orderClient.assembly(delivery.getOrderId());
     }
 
@@ -57,23 +59,24 @@ public class DeliveryService {
         Delivery delivery = deliveryRepository.findById(order.getDeliveryId()).orElseThrow(()-> new RuntimeException("Delivery with id " + order.getDeliveryId() + " not found"));
 
         double baseRate = 5.0;
+        double totalRate = baseRate;
         AddressDto addressWarehouse = warehouseClient.getWarehouseAddress();
         if (addressWarehouse.getCity().contains("ADDRESS_1")){
-            baseRate *= 2;
+            totalRate += baseRate;
         }
         if (addressWarehouse.getCity().contains("ADDRESS_2")){
-            baseRate *= 3;
+            totalRate += baseRate * 2;
         }
-        if (order.getFragile()){
-            baseRate *= 1.2;
+        if (Boolean.TRUE.equals(order.getFragile())){
+            totalRate += totalRate * 0.2;
         }
-        baseRate += order.getDeliveryWeight() * 0.3;
-        baseRate += order.getDeliveryVolume() * 0.2;
+        totalRate += order.getDeliveryWeight() * 0.3;
+        totalRate += order.getDeliveryVolume() * 0.2;
 
         if (!addressWarehouse.getStreet().equals(delivery.getToAddress().getStreet())){
-            baseRate *= 1.2;
+            totalRate += totalRate * 0.2;
         }
-        return baseRate;
+        return totalRate;
 
     }
 }

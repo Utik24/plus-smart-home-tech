@@ -1,8 +1,6 @@
 package ru.yandex.practicum.commerce.payment.mapper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.commerce.order.dto.OrderDto;
 import ru.yandex.practicum.commerce.payment.dto.PaymentDto;
@@ -26,7 +24,9 @@ public class PaymentMapper {
         dto.setPaymentId(entity.getPaymentId());
         dto.setTotalPayment(entity.getTotalPayment());
         dto.setDeliveryTotal(entity.getDeliveryTotal());
+        dto.setProductTotal(entity.getProductTotal());
         dto.setFeeTotal(entity.getTotalPayment() - entity.getDeliveryTotal() - entity.getProductTotal());
+        dto.setStatus(entity.getStatus());
         log.info("Результат маппинга в PaymentDto: {}", dto);
         return dto;
     }

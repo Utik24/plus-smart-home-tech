@@ -104,7 +104,7 @@ public class PaymentService {
         payment.setStatus(PaymentStatus.SUCCESS);
 
         try {
-            OrderDto dto = orderClient.payment(payment.getOrderId());
+            OrderDto dto = orderClient.paymentSuccess(payment.getOrderId());
             log.info("Обновляем статус заказа: {}", dto);
         } catch (FeignException e) {
             throw new RuntimeException(e.getMessage());

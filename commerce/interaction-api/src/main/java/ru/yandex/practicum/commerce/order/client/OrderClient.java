@@ -22,6 +22,9 @@ public interface OrderClient {
     @PostMapping("/return")
     OrderDto returnProducts(@Valid @RequestBody ProductReturnRequest request);
 
+    @PostMapping("/payment/success")
+    OrderDto paymentSuccess(@Valid @RequestBody UUID orderId);
+
     @PostMapping("/payment")
     OrderDto payment(@Valid @RequestBody UUID orderId);
 

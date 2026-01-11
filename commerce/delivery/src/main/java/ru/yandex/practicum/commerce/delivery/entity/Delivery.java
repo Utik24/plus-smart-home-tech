@@ -29,4 +29,10 @@ public class Delivery {
     private UUID orderId;
 
     private DeliveryState deliveryState;
+
+    private Double deliveryWeight;
+
+    private Double deliveryVolume;
+
+    private Boolean fragile;
 }

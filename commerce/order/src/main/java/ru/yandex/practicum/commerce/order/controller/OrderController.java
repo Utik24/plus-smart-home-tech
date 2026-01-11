@@ -43,6 +43,12 @@ public class OrderController implements OrderClient {
     }
 
     @Override
+    public OrderDto paymentSuccess(UUID orderId) {
+        log.info("Запрос при успешной оплате заказа: {}", orderId);
+        return orderService.paymentSuccess(orderId);
+    }
+
+    @Override
     public OrderDto paymentFailed(UUID orderId) {
         log.info("Запрос при неудачной оплате заказа: {}", orderId);
         return orderService.paymentFailed(orderId);
