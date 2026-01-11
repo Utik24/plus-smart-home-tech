@@ -51,7 +51,7 @@ public class WarehouseController implements WarehouseClient {
     }
 
     @Override
-    public void returnProductsToWarehouse(Map<UUID, Long> products) throws FeignException {
+    public void returnProductsToWarehouse(Map<UUID, Integer> products) throws FeignException {
         warehouseService.returnProductsToWarehouse(products);
     }
 

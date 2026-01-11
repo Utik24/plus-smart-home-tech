@@ -83,7 +83,7 @@ public class WarehouseService {
                 .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
     }
 
-    public void returnProductsToWarehouse(Map<UUID, Long> products) throws FeignException {
+    public void returnProductsToWarehouse(Map<UUID, Integer> products) throws FeignException {
         List<WarehouseProduct> warehouseProducts = warehouseRepository.findAllById(products.keySet());
         if (warehouseProducts.isEmpty()) {
             return;
