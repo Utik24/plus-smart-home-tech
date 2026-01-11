@@ -88,8 +88,10 @@ public class WarehouseService {
         if (warehouseProducts.isEmpty()) {
             return;
         }
-        warehouseProducts.forEach(warehouseProduct -> {warehouseProduct.setQuantity(warehouseProduct.getQuantity() +
-                products.get(warehouseProduct.getProductId()));});
+        warehouseProducts.forEach(warehouseProduct -> {
+            warehouseProduct.setQuantity(warehouseProduct.getQuantity() +
+                    products.get(warehouseProduct.getProductId()));
+        });
         warehouseRepository.saveAll(warehouseProducts);
     }
 }
