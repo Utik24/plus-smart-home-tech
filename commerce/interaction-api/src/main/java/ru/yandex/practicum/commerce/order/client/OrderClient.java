@@ -1,7 +1,9 @@
 package ru.yandex.practicum.commerce.order.client;
 
+import feign.FeignException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.commerce.order.dto.OrderDto;
@@ -14,42 +16,43 @@ import java.util.UUID;
 public interface OrderClient {
 
     @GetMapping
-    List<OrderDto> getOrders(@Valid @RequestParam @NotEmpty String username);
+    List<OrderDto> getOrders(@RequestParam @NotEmpty String username) throws FeignException;
 
     @PutMapping
-    OrderDto createOrder(@Valid @RequestParam @NotEmpty String username, @RequestBody OrderDto newOrder);
+    OrderDto createOrder(@RequestParam @NotEmpty String username, @Valid @RequestBody OrderDto newOrder)
+            throws FeignException;
 
     @PostMapping("/return")
-    OrderDto returnProducts(@Valid @RequestBody ProductReturnRequest request);
+    OrderDto returnProducts(@Valid @RequestBody ProductReturnRequest request) throws FeignException;
 
     @PostMapping("/payment/success")
-    OrderDto paymentSuccess(@Valid @RequestBody UUID orderId);
+    OrderDto paymentSuccess(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/payment")
-    OrderDto payment(@Valid @RequestBody UUID orderId);
+    OrderDto payment(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/failed")
-    OrderDto paymentFailed(@Valid @RequestBody UUID orderId);
+    OrderDto paymentFailed(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/delivery")
-    OrderDto delivery(@Valid @RequestBody UUID orderId);
+    OrderDto delivery(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/delivery/failed")
-    OrderDto deliveryFailed(@Valid @RequestBody UUID orderId);
+    OrderDto deliveryFailed(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/completed")
-    OrderDto completed(@Valid @RequestBody UUID orderId);
+    OrderDto completed(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/calculate/total")
-    OrderDto calculateTotal(@Valid @RequestBody UUID orderId);
+    OrderDto calculateTotal(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/calculate/delivery")
-    OrderDto calculateDelivery(@Valid @RequestBody UUID orderId);
+    OrderDto calculateDelivery(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/assembly")
-    OrderDto assembly(@Valid @RequestBody UUID orderId);
+    OrderDto assembly(@NotNull @RequestBody UUID orderId) throws FeignException;
 
     @PostMapping("/assembly/failed")
-    OrderDto assemblyFailed(@Valid @RequestBody UUID orderId);
+    OrderDto assemblyFailed(@NotNull @RequestBody UUID orderId) throws FeignException;
 
 }

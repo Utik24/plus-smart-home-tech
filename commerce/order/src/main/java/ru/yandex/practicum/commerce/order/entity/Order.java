@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.yandex.practicum.commerce.order.enums.OrderState;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,11 +39,11 @@ public class Order {
 
     private Boolean fragile;
 
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 
-    private Double deliveryPrice;
+    private BigDecimal  deliveryPrice;
 
-    private Double productPrice;
+    private BigDecimal  productPrice;
 
     @ElementCollection
     @CollectionTable(name="order_products", joinColumns = @JoinColumn(name = "order_id"))

@@ -14,6 +14,8 @@ import ru.yandex.practicum.commerce.payment.repository.PaymentRepository;
 import ru.yandex.practicum.commerce.shoppingstore.controller.ShoppingStoreClient;
 import ru.yandex.practicum.commerce.shoppingstore.dto.ProductDto;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,12 +47,12 @@ public class PaymentService {
         return PaymentMapper.mapToPaymentDto(payment);
     }
 
-    public Double calculateProductCost(OrderDto orderDto) {
+    public BigDecimal calculateProductCost(OrderDto orderDto) {
         Map<UUID, Integer> products = orderDto.getProducts();
         if (products == null || products.isEmpty()) {
             throw new IllegalArgumentException("Список продуктов не должен быть null или пустым");
         }
-        Double productCost = 0.0;
+        BigDecimal productCost = BigDecimal.ZERO;
         for (UUID productId : products.keySet()) {
             ProductDto product;
             try {
@@ -59,17 +61,22 @@ public class PaymentService {
             } catch (FeignException e) {
                 throw new RuntimeException(e.getMessage());
             }
-            productCost += product.getPrice() * products.get(productId);
+            BigDecimal price = BigDecimal.valueOf(product.getPrice());
+            BigDecimal quantity = BigDecimal.valueOf(products.get(productId));
+            productCost = productCost.add(price.multiply(quantity));
         }
         log.info("Стоимость продуктов в заказе: {}", productCost);
         return productCost;
     }
 
-    public Double calculateTotalCost(OrderDto orderDto) {
+    public BigDecimal calculateTotalCost(OrderDto orderDto) {
         if (orderDto.getProductPrice() == null || orderDto.getDeliveryPrice() == null) {
             throw new RuntimeException("Недостаточно данных для расчета полной стоимости заказа");
         }
-        Double totalCost = orderDto.getProductPrice() * 1.1 + orderDto.getDeliveryPrice();
+        BigDecimal totalCost = orderDto.getProductPrice()
+                .multiply(BigDecimal.valueOf(1.1))
+                .add(orderDto.getDeliveryPrice())
+                .setScale(2, RoundingMode.HALF_UP);
         log.info("Итоговая стоимость заказа: {}", totalCost);
         return totalCost;
     }

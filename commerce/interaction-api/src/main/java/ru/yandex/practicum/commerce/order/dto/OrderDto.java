@@ -1,12 +1,13 @@
 package ru.yandex.practicum.commerce.order.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.yandex.practicum.commerce.order.enums.OrderState;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 public class OrderDto {
     private UUID orderId;
 
-    @NotBlank
+    @NotNull
     private UUID shoppingCartId;
 
     private Map<UUID, Integer> products;
@@ -34,11 +35,11 @@ public class OrderDto {
 
     private Boolean fragile;
 
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 
-    private Double deliveryPrice;
+    private BigDecimal  deliveryPrice;
 
-    private Double productPrice;
+    private BigDecimal  productPrice;
 
 
 }

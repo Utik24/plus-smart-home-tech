@@ -6,6 +6,8 @@ import ru.yandex.practicum.commerce.order.dto.OrderDto;
 import ru.yandex.practicum.commerce.payment.dto.PaymentDto;
 import ru.yandex.practicum.commerce.payment.entity.Payment;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Component
 public class PaymentMapper {
@@ -25,7 +27,10 @@ public class PaymentMapper {
         dto.setTotalPayment(entity.getTotalPayment());
         dto.setDeliveryTotal(entity.getDeliveryTotal());
         dto.setProductTotal(entity.getProductTotal());
-        dto.setFeeTotal(entity.getTotalPayment() - entity.getDeliveryTotal() - entity.getProductTotal());
+        BigDecimal feeTotal = entity.getTotalPayment()
+                .subtract(entity.getDeliveryTotal())
+                .subtract(entity.getProductTotal());
+        dto.setFeeTotal(feeTotal);
         dto.setStatus(entity.getStatus());
         log.info("Результат маппинга в PaymentDto: {}", dto);
         return dto;

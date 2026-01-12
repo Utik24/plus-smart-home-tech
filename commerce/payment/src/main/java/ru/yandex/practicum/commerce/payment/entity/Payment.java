@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.yandex.practicum.commerce.payment.enums.PaymentStatus;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -21,13 +22,13 @@ public class Payment {
 
     private UUID orderId;
 
-    private Double totalPayment;
+    private BigDecimal  totalPayment;
 
-    private Double deliveryTotal;
+    private BigDecimal  deliveryTotal;
 
-    private Double feeTotal;
+    private BigDecimal  feeTotal;
 
-    private Double productTotal;
+    private BigDecimal productTotal;
 
     private PaymentStatus status;
 }

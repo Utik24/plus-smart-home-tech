@@ -8,6 +8,7 @@ import ru.yandex.practicum.commerce.delivery.dto.DeliveryDto;
 import ru.yandex.practicum.commerce.delivery.service.DeliveryService;
 import ru.yandex.practicum.commerce.order.dto.OrderDto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
@@ -42,7 +43,7 @@ public class DeliveryController implements DeliveryClient {
     }
 
     @Override
-    public Double getDeliveryCost(OrderDto order) {
+    public BigDecimal getDeliveryCost(OrderDto order) {
         log.info("Запрос на расчет стоимости доставки: {}", order);
         return deliveryService.getDeliveryCost(order);
     }

@@ -8,6 +8,7 @@ import ru.yandex.practicum.commerce.payment.client.PaymentClient;
 import ru.yandex.practicum.commerce.payment.dto.PaymentDto;
 import ru.yandex.practicum.commerce.payment.service.PaymentService;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
@@ -24,7 +25,7 @@ public class PaymentController implements PaymentClient {
     }
 
     @Override
-    public Double calculateTotalCost(OrderDto orderDto) {
+    public BigDecimal calculateTotalCost(OrderDto orderDto) {
         log.info("Запрос на рассчет стоимости продуктов: {}", orderDto);
         return paymentService.calculateTotalCost(orderDto);
     }
@@ -36,7 +37,7 @@ public class PaymentController implements PaymentClient {
     }
 
     @Override
-    public Double calculateProductCost(OrderDto orderDto) {
+    public BigDecimal calculateProductCost(OrderDto orderDto) {
         log.info("Запрос на рассчет стоимости продуктов: {}", orderDto);
         return paymentService.calculateProductCost(orderDto);
     }
