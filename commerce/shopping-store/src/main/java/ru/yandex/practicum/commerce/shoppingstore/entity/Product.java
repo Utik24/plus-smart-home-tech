@@ -3,6 +3,7 @@ package ru.yandex.practicum.commerce.shoppingstore.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.yandex.practicum.commerce.shoppingstore.enums.ProductCategory;
 import ru.yandex.practicum.commerce.shoppingstore.enums.ProductState;
 import ru.yandex.practicum.commerce.shoppingstore.enums.QuantityState;
 
@@ -43,5 +44,5 @@ public class Product {
     private ProductCategory productCategory;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private Double price;
 }

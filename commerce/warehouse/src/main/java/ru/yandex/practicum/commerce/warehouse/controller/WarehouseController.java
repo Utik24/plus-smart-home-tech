@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.commerce.shoppingcart.entity.dto.ShoppingCartDto;
-import ru.yandex.practicum.commerce.warehouse.entity.dto.AddProductToWarehouseRequest;
-import ru.yandex.practicum.commerce.warehouse.entity.dto.AddressDto;
-import ru.yandex.practicum.commerce.warehouse.entity.dto.BookedProductsDto;
-import ru.yandex.practicum.commerce.warehouse.entity.dto.NewProductInWarehouseRequest;
+import ru.yandex.practicum.commerce.warehouse.entity.OrderBooking;
+import ru.yandex.practicum.commerce.warehouse.entity.dto.*;
+import ru.yandex.practicum.commerce.warehouse.service.WarehouseOrderService;
 import ru.yandex.practicum.commerce.warehouse.service.WarehouseService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -19,6 +21,8 @@ import ru.yandex.practicum.commerce.warehouse.service.WarehouseService;
 public class WarehouseController implements WarehouseClient {
 
     private final WarehouseService warehouseService;
+    private final WarehouseOrderService warehouseOrderService;
+
 
     @Override
     public void addProduct(NewProductInWarehouseRequest request) throws FeignException {
@@ -38,5 +42,30 @@ public class WarehouseController implements WarehouseClient {
     @Override
     public AddressDto getWarehouseAddress() throws FeignException {
         return warehouseService.getWarehouseAddress();
+    }
+
+
+    @Override
+    public void shippedWarehouse(ShippedToDeleveryRequest request) throws FeignException {
+        warehouseOrderService.updateDeliveryId(request.getOrderId(), request.getDeliveryId());
+    }
+
+    @Override
+    public void returnProductsToWarehouse(Map<UUID, Integer> products) throws FeignException {
+        warehouseService.returnProductsToWarehouse(products);
+    }
+
+    @Override
+    public BookedProductsDto assembleProducts(AssemblyProductsForOrderRequest request) throws FeignException {
+        ShoppingCartDto shoppingCartDto = new ShoppingCartDto(request.getOrderId(), request.getProducts());
+        BookedProductsDto bookedProductsDto = checkProductCount(shoppingCartDto);
+        warehouseService.reserveProducts(request.getProducts());
+
+        OrderBooking orderBooking = new OrderBooking();
+        orderBooking.setOrderId(request.getOrderId());
+        orderBooking.setProducts(request.getProducts());
+        warehouseOrderService.save(orderBooking);
+
+        return bookedProductsDto;
     }
 }

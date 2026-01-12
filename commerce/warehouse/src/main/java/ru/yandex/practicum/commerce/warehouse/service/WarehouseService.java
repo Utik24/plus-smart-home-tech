@@ -1,5 +1,6 @@
 package ru.yandex.practicum.commerce.warehouse.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,7 @@ import ru.yandex.practicum.commerce.warehouse.mapper.WarehouseMapper;
 import ru.yandex.practicum.commerce.warehouse.repository.WarehouseRepository;
 
 import java.security.SecureRandom;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,6 +33,7 @@ public class WarehouseService {
             ADDRESSES[Random.from(new SecureRandom()).nextInt(0, ADDRESSES.length)];
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
+
 
     @Transactional
     public void addProduct(NewProductInWarehouseRequest request) {
@@ -82,5 +81,34 @@ public class WarehouseService {
     private Map<UUID, WarehouseProduct> getWarehouseProducts(Collection<UUID> productIds) {
         return warehouseRepository.findAllById(productIds).stream()
                 .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
+    }
+
+    @Transactional
+    public void reserveProducts(Map<UUID, Integer> products) {
+        Map<UUID, WarehouseProduct> productsById = getWarehouseProducts(products.keySet());
+        products.forEach((productId, quantity) -> {
+            WarehouseProduct warehouseProduct = productsById.get(productId);
+            if (warehouseProduct == null) {
+                throw new WarehouseProductNotFoundException(productId);
+            }
+            long availableQuantity = warehouseProduct.getQuantity();
+            if (availableQuantity < quantity) {
+                throw new InsufficientProductQuantityException(productId, quantity, availableQuantity);
+            }
+            warehouseProduct.setQuantity(availableQuantity - quantity);
+        });
+        warehouseRepository.saveAll(productsById.values());
+    }
+
+    public void returnProductsToWarehouse(Map<UUID, Integer> products) throws FeignException {
+        List<WarehouseProduct> warehouseProducts = warehouseRepository.findAllById(products.keySet());
+        if (warehouseProducts.isEmpty()) {
+            return;
+        }
+        warehouseProducts.forEach(warehouseProduct -> {
+            warehouseProduct.setQuantity(warehouseProduct.getQuantity() +
+                    products.get(warehouseProduct.getProductId()));
+        });
+        warehouseRepository.saveAll(warehouseProducts);
     }
 }
